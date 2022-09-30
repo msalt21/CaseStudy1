@@ -5,7 +5,7 @@ close all;
 
 %% Preparing Training Dat
 % change this if you want to change testing/training ratio
-percentTraining = 0.8;
+percentTraining = 0.1;
 
 % Initializing the trainingData matrix and the trainingDataLabels vectors
 % so that they can be concatenated onto
@@ -27,15 +27,15 @@ for num = 1:9 %for each division
     % percentTraining*size(data,1) is a decimal. 
     selectedIndices = randperm(size(data,1), ... 
         int32(percentTraining*size(data,1)));
+    % first param gives the range of random numbers selected
+    % second param gives the number of numbers we are going to generate
+    % (i.e. size of training set for each division)
     
     % extracts the labels and data row vectors only cooresponding to the
     % indices which were randomly selected above
     divTrainingLabels = labels(selectedIndices);
     divTraining = data(selectedIndices,:);
-    % first param gives the range of random numbers selected
-    % second param gives the number of numbers we are going to generate
-    % (i.e. size of training set for each division)
-
+    
     % Concatenates the rows from division num that we want to use for
     % training onto the ones that we have already extracted
     trainingData = [trainingData; divTraining];
