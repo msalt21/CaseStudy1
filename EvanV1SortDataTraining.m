@@ -1,11 +1,10 @@
-
 clear;
 load COVIDbyCounty.mat
-close all;
+
 
 %% Preparing Training Dat
 % change this if you want to change testing/training ratio
-percentTraining = 0.1;
+percentTraining = 0.05;
 
 % Initializing the trainingData matrix and the trainingDataLabels vectors
 % so that they can be concatenated onto
@@ -53,9 +52,10 @@ trainingData = [trainingDataLabels trainingData];
 clear("trainingDataLabels");
 
 %% Running K Means
-k = 15; 
+k = 9; 
+
 % change this if you want to experinent with different numbers of clusters
-[idx,C,sumd,D] = kmeans(trainingData(:,2:end),k,'replicates', 150);
+[idx,C,sumd,D] = kmeans(trainingData(:,2:end),k,'replicates', 1000);
 % might want to experiment with sumd and D variables
 % n = number of points/rows in trainingData
 % m = dimension of each row vector/columns in trainingData/amount of dates
@@ -78,14 +78,57 @@ trainingData = [idx trainingData];
 % sorts training data according to the cluster values so you can scroll and
 % visually see which division regions are part of each cluster
 trainingData = sortrows(trainingData, 1);
+% see function below
+centroidsToDivisions = centroid_division(k, trainingData);
 
 % This code is for visualizing the results
 figure;
-silhouette(trainingData(:,3:end), idx);
+silhouette(trainingData(:,3:end),trainingData(:,1));
 xlim([-1 1]);
 
-figure; 
-plot(trainingData(trainingData(:,1) == 2,:)');
+
+% This function assigns centroid numbers to a division based on what
+% division makes up the majority of a cluster
+% INPUTS: num_clusters (number of clusters, scalor) and data (matrix of
+% sorted COVID time series data with cluster assignments in the first row)
+% OUTPUT: division_number, a num_clusters x 6 matrix that holds the top 3
+% clusters to appear in each cluster in rows 1-3, and the names of those
+% clusters in rows 4-6.
+function division_number = centroid_division(num_clusters, data)
+    x = num_clusters;
+    % Most common division
+    for clust = 1:num_clusters
+        subdata = data(data(:,1) == clust, 2);
+        x(clust,1) = string(mode(subdata));
+      
+    end
+    % Second most common division
+    for clust = 1:num_clusters
+        subdata = data(data(:,1) == clust, 2);
+        x(clust,2) = string(mode(subdata(subdata ~= mode(subdata))));
+       
+    end
+    % Third most common division
+    for clust = 1:num_clusters
+        subdata = data(data(:,1) == clust, 2);
+        first = mode(subdata);
+        second = mode(subdata(subdata ~= mode(subdata)));
+        x(clust,3) = string(mode(subdata(subdata ~= first & ...
+            subdata ~= second)));
+    end
+    % Setting return value
+    division_number = x;
+end
+
+%% Bulleted List
+% * GOAL: use the training data to optomize the starting centroids in 
+% kmeans() for the testing data (or use the clusters and just assign
+% testing data points to the nearest neighbor cluster?)
+% * might want to pick a better method of assigning the clusters (instead
+% of picking most frequent division in each cluster, maybe theres a better
+% way?). Also, might want to run kmeans on clusters that have a large
+% variety of divisions.
+
 
 
 
