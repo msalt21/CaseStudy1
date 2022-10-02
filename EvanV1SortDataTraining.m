@@ -4,7 +4,7 @@ load COVIDbyCounty.mat
 
 %% Preparing Training Dat
 % change this if you want to change testing/training ratio
-percentTraining = 0.05;
+percentTraining = 0.8;
 
 % Initializing the trainingData matrix and the trainingDataLabels vectors
 % so that they can be concatenated onto
@@ -42,8 +42,8 @@ for num = 1:9 %for each division
     trainingDataLabels = [trainingDataLabels; divTrainingLabels];
 end
 
-% get rid of column of zeros (initialized each vector/matrix with a column of
-% zeros so I could concatenate onto that)
+% get rid of column of zeros (initialized each vector/matrix with a column 
+% of zeros so I could concatenate onto that)
 trainingData = trainingData(2:end,:);
 trainingDataLabels = trainingDataLabels(2:end);
 % Concatenates the training data labels onto training data so we know which
@@ -52,7 +52,7 @@ trainingData = [trainingDataLabels trainingData];
 clear("trainingDataLabels");
 
 %% Running K Means
-k = 9; 
+k = 20; 
 
 % change this if you want to experinent with different numbers of clusters
 [idx,C,sumd,D] = kmeans(trainingData(:,2:end),k,'replicates', 1000);
@@ -95,17 +95,17 @@ xlim([-1 1]);
 % clusters to appear in each cluster in rows 1-3, and the names of those
 % clusters in rows 4-6.
 function division_number = centroid_division(num_clusters, data)
-    x = num_clusters;
+    x = zeros(num_clusters,3);
     % Most common division
     for clust = 1:num_clusters
         subdata = data(data(:,1) == clust, 2);
-        x(clust,1) = string(mode(subdata));
+        x(clust,1) = mode(subdata);
       
     end
     % Second most common division
     for clust = 1:num_clusters
         subdata = data(data(:,1) == clust, 2);
-        x(clust,2) = string(mode(subdata(subdata ~= mode(subdata))));
+        x(clust,2) = mode(subdata(subdata ~= mode(subdata)));
        
     end
     % Third most common division
@@ -113,14 +113,13 @@ function division_number = centroid_division(num_clusters, data)
         subdata = data(data(:,1) == clust, 2);
         first = mode(subdata);
         second = mode(subdata(subdata ~= mode(subdata)));
-        x(clust,3) = string(mode(subdata(subdata ~= first & ...
-            subdata ~= second)));
+        x(clust,3) = mode(subdata(subdata ~= first & ...
+            subdata ~= second));
     end
     % Setting return value
     division_number = x;
 end
 
-%% Bulleted List
 % * GOAL: use the training data to optomize the starting centroids in 
 % kmeans() for the testing data (or use the clusters and just assign
 % testing data points to the nearest neighbor cluster?)
