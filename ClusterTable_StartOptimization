@@ -71,6 +71,8 @@ k = 9;
 % (ideally want to minimize this) (k x 1)
 % D = distances of each point to EVERY centroid (size: n x k)
 
+%% Optimizing K Means
+
 %% Making Sense of the Clusters
 % - need to assign each cluster to a division
 % - possibility - find out which division makes up the majority in each
@@ -91,6 +93,12 @@ table_initial_clusters = array2table(centroidsToDivisions, 'VariableNames',table
 
 % This code is for visualizing the results
 figure;
+silhouette_vals = silhouette(trainingData(:,3:end),trainingData(:,1));
+% 
+% for clust = 1:k
+%     avg_silhouette_val(clust) = mean()
+% end
+
 silhouette(trainingData(:,3:end),trainingData(:,1));
 xlim([-1 1]);
 
@@ -106,7 +114,7 @@ end
 
 weighted_Freq1 = table_initial_clusters.Freq1ByLength;
 
-
+%% Classifying Clusters
 
 %% Bulleted List
 % * GOAL: use the training data to optimize the starting centroids in 
