@@ -1,0 +1,11 @@
+%%TODO
+% * identify problematic/outlier vectors in the training set (should be in their own clusters) and get rid of
+% them --> run kmeans on the remaining vectors
+% * for clusters with low silhouette values, run kmeans within those
+% clusters to create new clusters
+% * use some sort of weight function that takes into account (1) what
+% proportion of the cluster is from the same division and (2) the total
+% size of the cluster
+% * change the parameters: (1) how many clusters (2) initiating the
+% centrois (should we let kmeans handle this or try to come up with
+% something ourselves?) (3) linear transformation?
