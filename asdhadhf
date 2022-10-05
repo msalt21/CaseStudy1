@@ -1,0 +1,6 @@
+testing_index = ~ismember(CNTY_COVID,trainingData(:,2:end), 'rows');
+temp_CNTY_COVID = [divisionLabels CNTY_COVID];
+testing_set = temp_CNTY_COVID(testing_index,:);
+
+idx = knnsearch(C,testing_set(:,2:end));
+idx = [idx testing_set(:,1)];
