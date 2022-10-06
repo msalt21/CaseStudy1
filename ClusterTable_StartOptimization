@@ -38,7 +38,10 @@ for num = 1:9 %for each division
     % indices which were randomly selected above
     divTrainingLabels = labels(selectedIndices);
     divTraining = data(selectedIndices,:);
-    
+
+
+  
+
     % Concatenates the rows from division num that we want to use for
     % training onto the ones that we have already extracted
     trainingData = [trainingData; divTraining];
@@ -56,7 +59,7 @@ trainingData = [trainingDataLabels trainingData];
 clear("trainingDataLabels");
 
 %% Running K Means
-k = 9; 
+k = 12; 
 
 % change this if you want to experinent with different numbers of clusters
 [idx,C,sumd,D] = kmeans(trainingData(:,2:end),k,'replicates', 1000);
@@ -90,6 +93,13 @@ centroidsToDivisions = centroid_division(k, trainingData);
 table_labels = {'Most Common Div', '2nd Most Common Div','3rd Most Common Div' ...
     'Mean', 'FreqMode1', 'FreqMode2', 'FreqMode3','ClusterLength','Freq1ByLength'};
 table_initial_clusters = array2table(centroidsToDivisions, 'VariableNames',table_labels);
+
+testing_index = ~ismember(CNTY_COVID,trainingData(:,3:end), 'rows');
+temp_CNTY_COVID = [divisionLabels CNTY_COVID];
+testing_set = temp_CNTY_COVID(testing_index,:);
+
+idx = knnsearch(C,testing_set(:,2:end));
+idx = [idx centroidsToDivisions(idx, 1) testing_set(:,1)];
 
 % This code is for visualizing the results
 figure;
@@ -171,8 +181,3 @@ function division_number = centroid_division(num_clusters, data)
     % Setting return value
     division_number = x;
 end
-
-
-
-
-
